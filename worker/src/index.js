@@ -14,7 +14,7 @@ app.get('/api/products/health', (req, res) => {
 
 // Endpoint dữ liệu nghiệp vụ giả lập
 app.get('/api/products', (req, res) => {
-    res.json({ message: "Hello from Worker Service!", timestamp: new Date() });
+    res.json({ message: "Hello from Worker Service!", timestamp: new Date(), message: "worker" });
 });
 
 app.listen(PORT, HOST, () => {

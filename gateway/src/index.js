@@ -19,17 +19,11 @@ app.get("/", (req, res) => {
     res.send('Gateway Auth Service is running!\n');
 });
 
-// 3. Forward request sang worker
-app.get("/api/data", async (req, res) => {
-    try {
-        const response = await axios.get(`${SERVICE_URL}/api/products`, { timeout: 3000 });
-        res.json(response.data);
-    } catch (error) {
-        res.status(502).json({ 
-            error: "Backend Worker unavailable", 
-            details: error.message 
-        });
-    }
+// 3. Endpoint dữ liệu nghiệp vụ giả lập
+app.get("/api/auth", async (req, res) => {
+    res.json({
+        message: "gateway Service is operational",
+    });
 });
 
 app.listen(PORT, HOST, () => {
