@@ -35,3 +35,4 @@ app.get("/api/data", async (req, res) => {
 app.listen(PORT, HOST, () => {
     console.log(`Gateway service running on http://${HOST}:${PORT}`);
 });
+// Trigger CI/CD test
