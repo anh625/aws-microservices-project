@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 // 3. Forward request sang worker
 app.get("/api/data", async (req, res) => {
     try {
-        const response = await axios.get(`${SERVICE_URL}/api/data`, { timeout: 3000 });
+        const response = await axios.get(`${SERVICE_URL}/api/products`, { timeout: 3000 });
         res.json(response.data);
     } catch (error) {
         res.status(502).json({ 
