@@ -3,43 +3,35 @@
 const express = require('express');
 const axios = require('axios');
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
-const SERVICE_URL = process.env.SERVICE_URL || "http://worker"; 
+const SERVICE_URL = process.env.SERVICE_URL || "http://worker:3001"; 
 
-function startServer(app) {
-    return new Promise((resolve, reject) => {
-        app.listen(PORT, HOST, err => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                console.log(`Running on http://${HOST}:${PORT}`);
-                resolve();
-            }
-        });
-    });
-}
+const app = express();
 
-async function main() {
+// 1. Health check endpoint cho ALB Target Group
+app.get('/api/auth/health', (req, res) => {
+    res.status(200).json({ status: 'OK', service: 'gateway-auth' });
+});
 
-    const app = express();
+// 2. Root route
+app.get("/", (req, res) => {
+    res.send('Gateway Auth Service is running!\n');
+});
 
-    app.get("/", (req, res) => {
-        res.send('Hello computer!\n');
-    });
-
-    app.get("/api/data", async (req, res) => {
-        const response = await axios.get(SERVICE_URL + "/api/data")
+// 3. Forward request sang worker
+app.get("/api/data", async (req, res) => {
+    try {
+        const response = await axios.get(`${SERVICE_URL}/api/data`, { timeout: 3000 });
         res.json(response.data);
-    });
+    } catch (error) {
+        res.status(502).json({ 
+            error: "Backend Worker unavailable", 
+            details: error.message 
+        });
+    }
+});
 
-    await startServer(app);
-}
-
-main() 
-    .then(() => console.log("Online"))
-    .catch(err => {
-        console.error("Failed to start!");
-        console.error(err && err.stack || err);
-    });
+app.listen(PORT, HOST, () => {
+    console.log(`Gateway service running on http://${HOST}:${PORT}`);
+});

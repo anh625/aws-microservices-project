@@ -1,45 +1,22 @@
 'use strict';
 
 const express = require('express');
-const mongodb = require('mongodb');
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || "0.0.0.0";
-const DBHOST = process.env.DBHOST || "mongodb://localhost:27017";
 
-function startServer(app) {
-    return new Promise((resolve, reject) => {
-        app.listen(PORT, HOST, err => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                console.log(`Running on http://${HOST}:${PORT}`);
-                resolve();
-            }
-        });
-    });
-}
+const app = express();
 
-async function main() {
+// Health check endpoint cho ALB Target Group
+app.get('/api/products/health', (req, res) => {
+    res.status(200).json({ status: 'OK', service: 'worker-product' });
+});
 
-    const client = await mongodb.MongoClient.connect(DBHOST);
-    const db = client.db("mydb");
+// Endpoint dữ liệu nghiệp vụ giả lập
+app.get('/api/data', (req, res) => {
+    res.json({ message: "Hello from Worker Service!", timestamp: new Date() });
+});
 
-    const app = express();
-
-    app.get("/api/data", async (req, res) => {
-        const collection = db.collection("mycollection");
-        const documents = await collection.find().toArray();
-        res.json(documents);
-    });
-
-    await startServer(app);
-}
-
-main() 
-    .then(() => console.log("Online"))
-    .catch(err => {
-        console.error("Failed to start!");
-        console.error(err && err.stack || err);
-    });
+app.listen(PORT, HOST, () => {
+    console.log(`Worker service running on http://${HOST}:${PORT}`);
+});
