@@ -9,6 +9,21 @@ const HOST = process.env.HOST || "0.0.0.0";
 const app = express();
 app.use(express.json());
 
+// Khởi tạo Connection Pool tới Amazon RDS MySQL
+const dbPool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME || 'microservices_db',
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 5,
+    connectTimeout: 5000,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
+
 // 1. Health check endpoint cho ALB Target Group
 app.get('/api/orders/health', (req, res) => {
     res.status(200).json({ status: 'OK', service: 'order-service' });
