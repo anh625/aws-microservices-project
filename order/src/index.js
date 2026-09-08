@@ -18,8 +18,8 @@ app.get('/api/orders', (req, res) => {
     res.json({
         message: "Order Service is operational",
         orders: [
-            { id: "ORD-001", item: "AWS Cloud Course", total: 99.0 },
-            { id: "ORD-002", item: "Microservices Book", total: 45.0 }
+            { id: "ORD-001", item: "AWS Cloud Course", total: 91.0 },
+            { id: "ORD-002", item: "Microservices Book", total: 41.0 }
         ]
     });
 });
