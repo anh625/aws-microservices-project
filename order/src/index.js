@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const mysql = require('mysql2/promise');
 
 const PORT = process.env.PORT || 3002;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -22,6 +23,23 @@ app.get('/api/orders', (req, res) => {
             { id: "ORD-002", item: "Microservices Book", total: 41.0 }
         ]
     });
+});
+
+// 3. Endpoint kiểm thử kết nối MySQL
+app.get('/api/orders/db-test', async (req, res) => {
+    try {
+        const [rows] = await dbPool.query('SELECT 1 + 1 AS solution, NOW() AS currentTime');
+        res.json({
+            database_status: "Connected successfully to RDS MySQL!",
+            query_result: rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({
+            database_status: "Connection failed",
+            error_code: error.code,
+            details: error.message
+        });
+    }
 });
 
 app.listen(PORT, HOST, () => {
