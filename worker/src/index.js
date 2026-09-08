@@ -18,7 +18,10 @@ const dbPool = mysql.createPool({
     port: process.env.DB_PORT || 3306,
     waitForConnections: true,
     connectionLimit: 5,
-    connectTimeout: 5000 // Hết hạn sau 5 giây nếu bị chặn mạng bởi Security Group
+    connectTimeout: 5000,
+    ssl: {
+        rejectUnauthorized: false // Cho phép kết nối TLS tới chứng chỉ mặc định của Amazon RDS
+    }
 });
 
 // 1. Health check endpoint cho ALB Target Group
@@ -29,7 +32,6 @@ app.get('/api/products/health', (req, res) => {
 // 2. Endpoint kiểm thử kết nối MySQL
 app.get('/api/products/db-test', async (req, res) => {
     try {
-        // Thực thi truy vấn nhẹ để kiểm tra kết nối
         const [rows] = await dbPool.query('SELECT 1 + 1 AS solution, NOW() AS currentTime');
         res.json({
             database_status: "Connected successfully to RDS MySQL!",
